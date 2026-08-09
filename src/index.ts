@@ -1,31 +1,31 @@
+import { folderOwnership } from './rules/folder-ownership.js';
+import { maxFileLines } from './rules/max-file-lines.js';
+import { pureIndexBarrel } from './rules/pure-index-barrel.js';
+import { requireJsdoc } from './rules/require-jsdoc.js';
+import { requireVariableJsdoc } from './rules/require-variable-jsdoc.js';
+import { roleFileShape } from './rules/role-file-shape.js';
+
 import type { Rule } from 'eslint';
 
-import { maxFileLines } from './rules/max-file-lines.js';
-import { requireExportedVariableJsdoc } from './rules/require-exported-variable-jsdoc.js';
-
-export { DEFAULT_THRESHOLDS, forgetThresholds, readThresholds } from './thresholds.js';
-export type { Thresholds } from './thresholds.js';
-
 /**
- * What scopes every rule id.
+ * The plugin's name, which every rule id is scoped by.
  *
- * A rule configured as `dharness/max-file-lines` resolves because of this
- * field, not because of the package name. Verified by running it: react-doctor
- * loads the same object ESLint does and reads the prefix from here.
+ * It comes from here and not from the package name: a rule declared as
+ * `dharness/max-file-lines` resolves because this says `dharness`, whatever
+ * the package on disk is called.
  */
 export const meta = { name: 'dharness' } as const;
 
+/** Every rule this plugin publishes. */
 export const rules: Record<string, Rule.RuleModule> = {
+  'folder-ownership': folderOwnership,
   'max-file-lines': maxFileLines,
-  'require-exported-variable-jsdoc': requireExportedVariableJsdoc,
+  'pure-index-barrel': pureIndexBarrel,
+  'require-jsdoc': requireJsdoc,
+  'require-variable-jsdoc': requireVariableJsdoc,
+  'role-file-shape': roleFileShape,
 };
 
-/**
- * The plugin.
- *
- * `meta` and `rules` are also exported by name so a CommonJS `require` of this
- * package answers with them directly. react-doctor loads plugins that way, and
- * a package that only offers a default export would arrive as an object with
- * one useless key.
- */
+// `meta` and `rules` are also exported by name above, because react-doctor
+// loads a plugin with `require` and reads them off the module object.
 export default { meta, rules };
