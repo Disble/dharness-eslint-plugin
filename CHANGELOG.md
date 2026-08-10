@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/Disble/dharness-eslint-plugin/compare/dharness-eslint-plugin-v0.2.1...dharness-eslint-plugin-v0.3.0) (2026-08-10)
+
+
+### Features
+
+* lint this package with the rules it publishes ([116f2d1](https://github.com/Disble/dharness-eslint-plugin/commit/116f2d17cc1da36263887c0be30bd69b3997e1f6))
+
+
+### Bug Fixes
+
+* document every rule this package publishes ([e11cf67](https://github.com/Disble/dharness-eslint-plugin/commit/e11cf6736dd7ae4a9650f327d86d7df4fb8053ef))
+
 ## [0.2.1](https://github.com/Disble/dharness-eslint-plugin/compare/dharness-eslint-plugin-v0.2.0...dharness-eslint-plugin-v0.2.1) (2026-08-10)
 
 
