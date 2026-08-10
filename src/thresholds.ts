@@ -26,11 +26,24 @@ export const DEFAULT_THRESHOLDS: Thresholds = {
   roleSuffixes: ['.types.ts', '.constants.ts', '.helpers.ts', '.schema.ts'],
 };
 
+/**
+ * The file as it arrives: every field unknown, because it was written by hand.
+ *
+ * Typing it as `Thresholds` would assert that whatever is on disk already has
+ * the right shape, which is the one thing that cannot be assumed here.
+ */
 type ThresholdsFile = {
   readonly maxFileLines?: unknown;
   readonly roleSuffixes?: unknown;
 };
 
+/**
+ * One entry per project root.
+ *
+ * A lint run touches every file in a project and would otherwise read and
+ * parse the same file once per file. Keyed by root rather than globally so a
+ * monorepo still gets one answer per package.
+ */
 const cache = new Map<string, Thresholds>();
 
 /**
@@ -61,6 +74,7 @@ export function forgetThresholds(): void {
   cache.clear();
 }
 
+/** Walks up from a file until a thresholds file appears, or gives up. */
 function findRoot(fromFile: string): string | undefined {
   let directory = path.dirname(path.resolve(fromFile));
 
@@ -94,10 +108,12 @@ function parse(file: string): Thresholds {
   };
 }
 
+/** A ceiling of zero or minus one is a typo, not a decision, so it is refused. */
 function positiveInteger(value: unknown): number | undefined {
   return typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : undefined;
 }
 
+/** Refuses a partially valid list: one non-string means the file was hand-edited wrong. */
 function stringList(value: unknown): readonly string[] | undefined {
   if (!Array.isArray(value)) return undefined;
   const strings = value.filter((entry): entry is string => typeof entry === 'string');

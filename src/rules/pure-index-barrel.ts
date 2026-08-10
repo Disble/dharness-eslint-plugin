@@ -50,6 +50,7 @@ export const pureIndexBarrel: Rule.RuleModule = {
   },
 };
 
+/** Whether a statement forwards something from another module and nothing else. */
 function isReExport(statement: { type: string; source?: unknown; declaration?: unknown }): boolean {
   if (statement.type === 'ExportAllDeclaration') return true;
 
@@ -58,6 +59,7 @@ function isReExport(statement: { type: string; source?: unknown; declaration?: u
   return statement.type === 'ExportNamedDeclaration' && statement.source != null && statement.declaration == null;
 }
 
+/** Names the kind of statement in the message, so the fix is obvious from it. */
 function describe(type: string): string {
   if (type === 'ImportDeclaration') return 'import';
   if (type === 'ExportNamedDeclaration' || type === 'ExportDefaultDeclaration') return 'local export';

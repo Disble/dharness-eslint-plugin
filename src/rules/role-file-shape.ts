@@ -31,6 +31,7 @@ const SHAPES: Readonly<Record<string, readonly Kind[]>> = {
   '.helpers.ts': ['type', 'function'],
 };
 
+/** What a top-level declaration turns out to be, once its export wrapper is off. */
 type Kind = 'type' | 'value' | 'function' | 'class';
 
 /**
@@ -118,10 +119,12 @@ function classify(node: Declaration): Kind | undefined {
   }
 }
 
+/** A const holding an arrow function is a function; only the keyword differs. */
 function isFunction(init: { readonly type: string } | null | undefined): boolean {
   return init?.type === 'ArrowFunctionExpression' || init?.type === 'FunctionExpression';
 }
 
+/** Renders the allowed kinds as the sentence the message needs. */
 function readable(kinds: readonly Kind[]): string {
   const named = kinds.map((kind) => (kind === 'type' ? 'types' : `${kind}s`));
   if (named.length === 1) return named[0] as string;

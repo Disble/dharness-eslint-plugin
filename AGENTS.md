@@ -9,7 +9,8 @@ rule. A rule that another tool already covers does not belong here.
 ## Commands
 
     bun install --frozen-lockfile
-    bun run validate      # typecheck + tests
+    bun run validate      # typecheck + self-lint + tests
+    bun run lint          # builds, then lints this package with its own rules
     bun run build         # tsdown, emits CJS and ESM
     bun run e2e:pack      # packs the tarball and proves a consumer can load it
 
@@ -259,9 +260,9 @@ Repo-owned. Silence is drift; a stated deviation is a decision.
   audit`, which is not installed here; and React colocation rules for a package
   that contains no React. Landing it would point an agent at tooling this
   repository does not have.
-- `deviates: L1, L2 — empty.` This package publishes lint rules and does not run
-  any on itself: there is no `eslint.config.js` and no graph analysis. It is
-  cheap to close by linting the package with its own rules, and worth doing.
+- `deviates: L2 — empty.` No graph analysis runs here. L1 is closed: the package
+  lints itself with the rules it publishes, which found a real defect on the
+  first run — `src/index.ts` assembled the plugin while claiming to be a barrel.
 - `deviates: L4, L5, P06, P07 — no local gate.` CI is the only gate. Unlike
   dharness, this repository has a package manager, so a hook manager here costs
   little.

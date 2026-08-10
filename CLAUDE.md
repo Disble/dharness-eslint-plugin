@@ -38,7 +38,8 @@ could not be read stops every other rule with it.
 ## Commands
 
     bun install --frozen-lockfile
-    bun run validate      # typecheck + tests
+    bun run validate      # typecheck + self-lint + tests
+    bun run lint          # builds, then lints this package with its own rules
     bun run build         # tsdown, emits CJS and ESM
     bun run e2e:pack      # packs the tarball and proves a consumer can load it
 
