@@ -14,7 +14,21 @@ wanted rules of its own.
 | Rule | What it refuses |
 | --- | --- |
 | `dharness/max-file-lines` | A file past the project's ceiling |
-| `dharness/require-exported-variable-jsdoc` | An exported variable with no JSDoc above it |
+| `dharness/require-jsdoc` | A top-level declaration with no JSDoc above it |
+| `dharness/require-variable-jsdoc` | A top-level variable with no JSDoc immediately above it |
+| `dharness/role-file-shape` | A role file declaring something its name does not promise — a `.types.ts` holding a function |
+| `dharness/folder-ownership` | A module split into role files without moving into a folder of its own with an `index.ts` |
+| `dharness/pure-index-barrel` | An `index.ts` that does anything but re-export from its siblings |
+
+`require-jsdoc` and `require-variable-jsdoc` divide the file root between them —
+variables belong to the second, everything else to the first — so no declaration
+is ever reported twice.
+
+`role-file-shape`, `folder-ownership` and `pure-index-barrel` guard their own
+scope: they return early on files they do not judge. That is deliberate. Under
+react-doctor a rule's configuration is a severity and nothing else, so a rule
+that relies on a glob to be pointed at the right files would report every file
+in the project.
 
 ## Thresholds
 
@@ -35,6 +49,11 @@ from another without publishing a new version of this package.
 
 A missing or unreadable file falls back to the defaults. A linter that refuses
 to start because one number could not be read stops every other rule with it.
+
+`roleSuffixes` tells `folder-ownership` what counts as a split, so a project can
+invent a role and have it recognised. It does not teach `role-file-shape` what
+that role means — a suffix with no entry in its table is left alone rather than
+guessed at.
 
 ## Two hosts
 
