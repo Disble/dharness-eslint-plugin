@@ -1,6 +1,6 @@
 {
   "name": "dharness-eslint-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The guardrails dharness enforces on generated code: file size, documentation, and role-file shape. Loadable by ESLint and by react-doctor.",
   "license": "MIT",
   "type": "module",
