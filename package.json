@@ -3,6 +3,24 @@
   "version": "0.2.0",
   "description": "The guardrails dharness enforces on generated code: file size, documentation, and role-file shape. Loadable by ESLint and by react-doctor.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Disble/dharness-eslint-plugin.git"
+  },
+  "homepage": "https://github.com/Disble/dharness-eslint-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/Disble/dharness-eslint-plugin/issues"
+  },
+  "keywords": [
+    "eslint",
+    "eslint-plugin",
+    "react-doctor",
+    "typescript",
+    "architecture",
+    "lint",
+    "jsdoc",
+    "dharness"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.cts",
