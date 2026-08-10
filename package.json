@@ -29,7 +29,7 @@
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "e2e:pack": "node ./scripts/pack-e2e.mjs",
     "validate": "bun run typecheck && bun run test",
     "prepublishOnly": "bun run validate && bun run build"
   },
