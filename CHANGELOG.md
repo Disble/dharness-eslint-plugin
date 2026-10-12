@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/Disble/dharness-eslint-plugin/compare/dharness-eslint-plugin-v0.3.0...dharness-eslint-plugin-v0.4.0) (2026-10-12)
+
+
+### Features
+
+* **rules:** support configurable file-line counting ([bd7722e](https://github.com/Disble/dharness-eslint-plugin/commit/bd7722ee30f958e831faa2ca44fa48dc0b51a36a))
+
 ## [0.3.0](https://github.com/Disble/dharness-eslint-plugin/compare/dharness-eslint-plugin-v0.2.1...dharness-eslint-plugin-v0.3.0) (2026-08-10)
 
 
