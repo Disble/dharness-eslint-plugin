@@ -38,6 +38,8 @@ Numbers live in `.dharness/rules.json`, not in the rule:
 {
   "schema": "dharness.rules/v1",
   "maxFileLines": 500,
+  "countComments": false,
+  "countBlankLines": false,
   "roleSuffixes": [".types.ts", ".constants.ts", ".helpers.ts", ".schema.ts"]
 }
 ```
@@ -49,6 +51,47 @@ from another without publishing a new version of this package.
 
 A missing or unreadable file falls back to the defaults. A linter that refuses
 to start because one number could not be read stops every other rule with it.
+Each field falls back on its own: a value that is not a JSON boolean leaves the
+other fields alone instead of discarding them.
+
+### What `maxFileLines` counts
+
+By default a physical line counts only when it holds code. Two independent
+booleans widen that:
+
+| Line | Default | Counts when |
+| --- | --- | --- |
+| Code, with or without a trailing comment | counted once | always |
+| Comment-only, whitespace aside | ignored | `countComments: true` |
+| Empty or whitespace-only | ignored | `countBlankLines: true` |
+
+Both default to `false`. An existing project keeps its ceiling, but not the
+count it used to make: with the options absent, this plugin counts code only,
+where the previous one counted every physical line. Upgrading can therefore
+move a file across the line in one direction only — a documented file under the
+ceiling stops being reported. A project that wants the previous total-line
+policy opts back into it by setting both options to `true`.
+
+The classification reads the parser's tokens and comments, not a search for
+`//`. A comment marker inside a string, a template literal or a regex is text,
+so the line holding it counts as code. A line holding code beside a trailing
+comment is one line, counted once. A physically blank line is blank wherever it
+sits — including inside a block comment or a multiline literal — so
+`countBlankLines` decides it there too, and only then.
+
+Worked boundary — a file with three code lines, two comment-only lines and one
+blank line counts `3` by default, `5` with `countComments`, `4` with
+`countBlankLines`, and `6` with both. `maxFileLines` is enforced against that
+count: exactly that many counted lines pass and one more reports.
+
+This rule is the enforcement (L1). Its counted-line behaviour is pinned by the
+rule's own tests (L3). The permanent tarball gate (`bun run e2e:pack`) is an L6
+check of packaging, not of this policy: it proves the built package still loads
+and exports in both hosts, which is the entry-point drift it exists to catch.
+The runtime proof for the counting policy is a disposable consumer matrix run
+outside the repository, loading the packed plugin in a real ESLint CLI and
+asserting the report and exit code for each flag. That matrix is evidence for a
+change, not a check the repository keeps running.
 
 `roleSuffixes` tells `folder-ownership` what counts as a split, so a project can
 invent a role and have it recognised. It does not teach `role-file-shape` what
