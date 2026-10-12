@@ -18,12 +18,16 @@ const MAX_ASCENT = 24;
 export type Thresholds = {
   readonly maxFileLines: number;
   readonly roleSuffixes: readonly string[];
+  readonly countComments: boolean;
+  readonly countBlankLines: boolean;
 };
 
 /** What a project gets before it decides otherwise. */
 export const DEFAULT_THRESHOLDS: Thresholds = {
   maxFileLines: 500,
   roleSuffixes: ['.types.ts', '.constants.ts', '.helpers.ts', '.schema.ts'],
+  countComments: false,
+  countBlankLines: false,
 };
 
 /**
@@ -35,6 +39,8 @@ export const DEFAULT_THRESHOLDS: Thresholds = {
 type ThresholdsFile = {
   readonly maxFileLines?: unknown;
   readonly roleSuffixes?: unknown;
+  readonly countComments?: unknown;
+  readonly countBlankLines?: unknown;
 };
 
 /**
@@ -92,20 +98,52 @@ function findRoot(fromFile: string): string | undefined {
  * A malformed file falls back to the defaults instead of throwing.
  *
  * A linter that refuses to run because a number could not be read stops every
- * rule, including the ones that need no numbers at all.
+ * rule, including the ones that need no numbers at all. That covers a parse
+ * that fails and a document that parses but cannot be read from.
  */
 function parse(file: string): Thresholds {
-  let contents: ThresholdsFile;
+  let contents: unknown;
   try {
-    contents = JSON.parse(readFileSync(file, 'utf8')) as ThresholdsFile;
+    contents = JSON.parse(readFileSync(file, 'utf8'));
   } catch {
     return DEFAULT_THRESHOLDS;
   }
 
+  if (!isThresholdsDocument(contents)) return DEFAULT_THRESHOLDS;
+
   return {
     maxFileLines: positiveInteger(contents.maxFileLines) ?? DEFAULT_THRESHOLDS.maxFileLines,
     roleSuffixes: stringList(contents.roleSuffixes) ?? DEFAULT_THRESHOLDS.roleSuffixes,
+    countComments: booleanValue(contents.countComments) ?? DEFAULT_THRESHOLDS.countComments,
+    countBlankLines: booleanValue(contents.countBlankLines) ?? DEFAULT_THRESHOLDS.countBlankLines,
   };
+}
+
+/**
+ * Whether the parsed file is a document this rule can read fields from.
+ *
+ * `JSON.parse('null')` succeeds, so a catch around the parse is not enough:
+ * `null`, a scalar and an array all parse and all lack the fields below.
+ * Reading one of them used to throw straight out of `readThresholds` and stop
+ * the lint run — the exact outcome the malformed-file fallback exists to
+ * prevent. Only a non-null, non-array object is a document; the values inside
+ * it are still validated field by field.
+ */
+function isThresholdsDocument(value: unknown): value is ThresholdsFile {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Only a JSON boolean decides a counting policy.
+ *
+ * A missing field, `null`, `0`, `""` or any other non-boolean is not a
+ * decision, and neither is the string `"true"` nor the number `1`. Truthiness
+ * would accept the last two and reject the rest, turning a typo into a policy;
+ * reading the type instead means only an explicit boolean chooses, and
+ * everything else falls back to that field's default.
+ */
+function booleanValue(value: unknown): boolean | undefined {
+  return typeof value === 'boolean' ? value : undefined;
 }
 
 /** A ceiling of zero or minus one is a typo, not a decision, so it is refused. */
